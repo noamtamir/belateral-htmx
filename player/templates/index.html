@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/htmx.org@1.9.5" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
+    <title>BeLateral</title>
+    <style>
+h1, h2, h3 {
+  color: darkgreen;
+}
+a {
+  color: lightgreen;
+}
+
+a:hover {
+  color: green;
+  cursor: pointer;
+}
+
+a:active {
+  color: darkgreen;
+  cursor: pointer;
+}
+    </style>
+  </head>
+  <body style="text-align: center">
+    <h1>BeLateral</h1>
+    <div id="player-container">
+        <h3 id="now-playing"></h3>
+        <audio id="player" controls style="width: 80%">
+          <source type="audio/mpeg" />
+        </audio>
+    </div>
+    <ul id="track-list" style="list-style: none">
+        {% for track in tracks %}
+            <li><a hx-get="/player?track={{track}}"
+                hx-target="#player-container"
+                hx-swap="outerHTML"
+                >{{ track }}</a></li>
+        {% endfor %}
+    </ul>
+  </body>
+</html>
