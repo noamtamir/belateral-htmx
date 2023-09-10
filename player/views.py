@@ -8,7 +8,7 @@ def index(request):
     context = {"tracks": TRACK_LINKS.keys()}
     return render(request, 'index.html', context)
 
-@cache_control(max_age=3600)
+# @cache_control(max_age=3600)
 def player(request: HttpRequest):
     track_name = request.GET.get('track')
     track_link = TRACK_LINKS.get(track_name)

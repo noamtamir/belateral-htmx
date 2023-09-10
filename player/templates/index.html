@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://unpkg.com/htmx.org@1.9.5" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js" integrity="sha512-Siyxh4gyNM5SaERNa9BOZSPcu/auHyFUWn9OVFD7MxI3/dVPQklE7tfqS+pLmPHF1zo6UdDaJAp/thihrf0c7w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>BeLateral</title>
     <style>
 h1, h2, h3 {
@@ -28,7 +29,7 @@ a:active {
     <h1>BeLateral</h1>
     <div id="player-container">
         <h3 id="now-playing"></h3>
-        <audio id="player" controls style="width: 80%">
+        <audio id="player" controls onplay="attachAutoPan()" style="width: 80%">
           <source type="audio/mpeg" />
         </audio>
     </div>
@@ -40,5 +41,17 @@ a:active {
                 >{{ track }}</a></li>
         {% endfor %}
     </ul>
+    <script>
+      const audioCtx = new AudioContext()
+      const audioPlayer = document.querySelector('#player')
+      const source = audioCtx.createMediaElementSource(audioPlayer)
+      
+      Tone.setContext(audioCtx)
+      
+      function attachAutoPan () {
+        const autoPanner = new Tone.AutoPanner('10').toDestination().start()
+        Tone.connect(source, autoPanner)
+      }
+    </script>
   </body>
 </html>
