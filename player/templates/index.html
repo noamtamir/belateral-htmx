@@ -3,54 +3,102 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://unpkg.com/htmx.org@1.9.5" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js" integrity="sha512-Siyxh4gyNM5SaERNa9BOZSPcu/auHyFUWn9OVFD7MxI3/dVPQklE7tfqS+pLmPHF1zo6UdDaJAp/thihrf0c7w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script
+      src="https://unpkg.com/htmx.org@1.9.5"
+      integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO"
+      crossorigin="anonymous"
+    ></script>
     <title>BeLateral</title>
     <style>
-h1, h2, h3 {
-  color: darkgreen;
-}
-a {
-  color: lightgreen;
-}
+      h1,
+      h2,
+      h3 {
+        color: darkgreen;
+      }
+      a {
+        color: lightgreen;
+      }
 
-a:hover {
-  color: green;
-  cursor: pointer;
-}
+      a:hover {
+        color: green;
+        cursor: pointer;
+      }
 
-a:active {
-  color: darkgreen;
-  cursor: pointer;
-}
+      a:active {
+        color: darkgreen;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body style="text-align: center">
     <h1>BeLateral</h1>
     <div id="player-container">
-        <h3 id="now-playing"></h3>
-        <audio id="player" controls onplay="attachAutoPan()" style="width: 80%">
-          <source type="audio/mpeg" />
-        </audio>
+      <h3 id="now-playing"></h3>
+      <audio
+        id="player"
+        controls
+        onplay="startAutoPanner()"
+        crossorigin="anonymous"
+        style="width: 100%"
+      >
+        <source type="audio/mpeg" />
+      </audio>
     </div>
+    <input
+      type="range"
+      min="0.01"
+      max="10"
+      step="0.01"
+      value="0.1"
+      style="display: block"
+      oninput="updateValue()"
+    />
+    <output></output>
     <ul id="track-list" style="list-style: none">
-        {% for track in tracks %}
-            <li><a hx-get="/player?track={{track}}"
-                hx-target="#player-container"
-                hx-swap="outerHTML"
-                >{{ track }}</a></li>
-        {% endfor %}
+      {% for track in tracks %}
+      <li>
+        <a
+          hx-get="/player?track={{track}}"
+          hx-target="#player-container"
+          hx-swap="outerHTML"
+          >{{ track }}</a
+        >
+      </li>
+      {% endfor %}
     </ul>
     <script>
-      const audioCtx = new AudioContext()
-      const audioPlayer = document.querySelector('#player')
-      const source = audioCtx.createMediaElementSource(audioPlayer)
-      
-      Tone.setContext(audioCtx)
-      
-      function attachAutoPan () {
-        const autoPanner = new Tone.AutoPanner('10').toDestination().start()
-        Tone.connect(source, autoPanner)
+      const output = document.querySelector('output')
+      const inputElement = document.querySelector('input')
+      output.innerHTML = inputElement.value
+
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+      const lfo = audioCtx.createOscillator()
+      lfo.type = 'sine'
+      lfo.frequency.value = inputElement.value
+      const panner = audioCtx.createStereoPanner()
+      lfo.connect(panner.pan)
+      panner.connect(audioCtx.destination)
+
+      function startAutoPanner() {
+        audioCtx.resume()
+        let audioElement = document.getElementById('player')
+        let source = audioCtx.createMediaElementSource(audioElement)
+        source.connect(panner)
+        try {
+          lfo.start()
+        } catch (e) {
+          if (
+            e.message !==
+            "Failed to execute 'start' on 'AudioScheduledSourceNode': cannot call start more than once."
+          ) {
+            throw e
+          }
+        }
+      }
+
+      function updateValue() {
+        output.innerHTML = inputElement.value
+        lfo.frequency.value = inputElement.value
       }
     </script>
   </body>

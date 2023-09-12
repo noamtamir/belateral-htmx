@@ -1,6 +1,6 @@
 <div id="player-container">
   <h3 id="now-playing">{{ track_name }}</h3>
-  <audio id="player" controls controlsList="nodownload" onplay="attachAutoPan()" style="width: 80%">
+  <audio id="player" controls autoplay controlsList="nodownload" onplay="startAutoPanner()" crossorigin="anonymous" style="width: 100%">
     <source src="{{ track_link }}" type="audio/mpeg" />
   </audio>
 </div>
