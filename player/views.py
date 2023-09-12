@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpRequest
 from django.views.decorators.cache import cache_control
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from . models import TRACK_LINKS
 
@@ -9,6 +10,7 @@ def index(request):
     return render(request, 'index.html', context)
 
 # @cache_control(max_age=3600)
+@xframe_options_exempt
 def player(request: HttpRequest):
     track_name = request.GET.get('track')
     track_link = TRACK_LINKS.get(track_name)
