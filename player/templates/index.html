@@ -47,7 +47,7 @@
     <input
       type="range"
       min="0.01"
-      max="10"
+      max="0.5"
       step="0.01"
       value="0.1"
       style="display: block"
@@ -75,8 +75,11 @@
       const lfo = audioCtx.createOscillator()
       lfo.type = 'sine'
       lfo.frequency.value = inputElement.value
+      const gain = audioCtx.createGain()
+      gain.gain.value = 0.8
       const panner = audioCtx.createStereoPanner()
-      lfo.connect(panner.pan)
+      lfo.connect(gain)
+      gain.connect(panner.pan)
       panner.connect(audioCtx.destination)
 
       function startAutoPanner() {
